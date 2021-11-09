@@ -1,0 +1,114 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*每个页面公共css */
+page {
+	background-color: #F8F8F8;
+}
+.row {
+	display: flex;
+	flex-direction: row;
+}
+.center {
+	justify-content: center;
+	align-items: center;
+}
+.items {
+	align-items: center;
+}
+.justify {
+	justify-content: center;
+}
+.around {
+	justify-content: space-around;
+}
+.between {
+	justify-content: space-between;
+}
+.juend{
+	justify-content: flex-end;
+}
+.start{
+	align-items: flex-start;
+}
+.end{
+	align-items: flex-end;
+}
+.column {
+	display: flex;
+	flex-direction: column;
+}
+.line{
+	 overflow: hidden;
+	 -webkit-line-clamp: 1;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	 -webkit-box-orient: vertical;
+}
+@font-face {
+	font-family: xmt;
+	src: url('https://network-freight-1258702148.cos.ap-chengdu.myqcloud.com/fonts/xmt.ttf');
+}
+@font-face {
+	font-family: rzzy;
+	src: url('https://network-freight-1258702148.cos.ap-chengdu.myqcloud.com/fonts/rzzy.ttf');
+}
+
+

@@ -1,0 +1,186 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+/* 状态栏样式 */
+.tittle .page-main-top-left {
+  box-sizing: border-box;
+  font-weight: 900;
+  font-size: 17px;
+  font-weight: 900;
+}
+/* 主体框架 */
+.page-main {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(1, 1fr);
+  grid-row-gap: 10px;
+  position: relative;
+  box-sizing: border-box;
+  margin: 10px;
+  border-radius: 10px;
+}
+.page-main .cenTop {
+  overflow: hidden;
+  border-radius: 10px;
+  display: grid;
+  grid-template-rows: 130px 1fr 50px;
+  grid-template-columns: repeat(1, 1fr);
+}
+.page-main .cenTop .mainTop {
+  padding: 0 0px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.page-main .cenTop .mainTop .mainTop-left {
+  color: #fff;
+  width: calc(100%);
+}
+.page-main .cenTop .mainMid {
+  background-color: #fff;
+}
+.page-main .cenTop .mainMid .mai {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+.page-main .cenTop .mainMid .mai .picker-view {
+  width: 750rpx;
+  height: 600rpx;
+  margin-top: 20rpx;
+}
+.page-main .cenTop .mainMid .mai .item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 16px;
+}
+.page-main .cenTop .mainMid .inv-h-w {
+  overflow: hidden;
+  background-color: #f8f8f8;
+  height: 100rpx;
+  width: 100%;
+  display: flex;
+}
+.page-main .cenTop .mainMid .inv-h {
+  font-size: 30rpx;
+  flex: 1;
+  text-align: center;
+  color: #C9C9C9;
+  height: 100rpx;
+  line-height: 100rpx;
+}
+.page-main .cenTop .mainMid .inv-h-s {
+  position: relative;
+  color: #007AFF;
+  font-weight: 900;
+  z-index: 99;
+}
+.page-main .cenTop .mainMid .inv-h-s::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: #fff;
+  -webkit-transform: scaleY(1) perspective(0.9em) rotateX(3deg);
+          transform: scaleY(1) perspective(0.9em) rotateX(3deg);
+  box-shadow: 0px 5px 10px -5px rgba(0, 0, 0, 0.2);
+  -webkit-transform-origin: left;
+          transform-origin: left;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.page-main .cenTop .mainMid .inv-h-e {
+  position: relative;
+  color: #007AFF;
+  font-weight: 900;
+  z-index: 99;
+}
+.page-main .cenTop .mainMid .inv-h-e::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: #fff;
+  -webkit-transform: scaleY(1) perspective(0.9em) rotateX(3deg);
+          transform: scaleY(1) perspective(0.9em) rotateX(3deg);
+  box-shadow: 0px 5px 10px -5px rgba(0, 0, 0, 0.2);
+  -webkit-transform-origin: right;
+          transform-origin: right;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.page-main .cenTop .mainBot {
+  background-color: #f7fbfc;
+}
+.page-main .cenBottom {
+  background-color: transparent;
+  overflow: hidden;
+  overflow-x: auto;
+  display: flex;
+  flex-flow: column wrap;
+}
+.page-main .cenBottom .columnInfo {
+  display: grid;
+  grid-template-rows: 30px 1fr 30px;
+  grid-template-columns: repeat(1, 1fr);
+  overflow: hidden;
+  height: 45%;
+  margin: 10rpx;
+  width: calc(100% / 2.1 - 20rpx);
+  border-radius: 15px;
+  box-shadow: 0px 5px 10px -5px rgba(0, 0, 0, 0.3);
+}
+.page-main .cenBottom .columnInfo .columnInfo-top {
+  color: #fff;
+  font-size: 12px;
+  font-weight: bolder;
+  padding: 0 20px;
+  background-color: #f7fbfc;
+  background: linear-gradient(to left, #52cfdd, #1ebab3);
+}
+.page-main .cenBottom .columnInfo .columnInfo-mid .midRows {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(1, 1fr);
+}
+.page-main .cenBottom .columnInfo .columnInfo-mid .midRows .midRows-info .midRows-info-right {
+  width: calc(100% - 28px);
+}
+.page-main .cenBottom .columnInfo .columnInfo-bot {
+  color: #000;
+  font-size: 11px;
+  font-weight: bolder;
+  background-color: #f7fbfc;
+}
+
