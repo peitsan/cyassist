@@ -1,5 +1,23 @@
+<template>
+  <div id="app">
+    <router-view></router-view>
+  </div>
+</template>
 <script>
+	import { MP } from './BMap' 
 	export default {
+		  name: 'App',
+		  components: {
+		
+		  },
+		  data(){
+			  return{
+				ak:'H8DKqCMdiFB2xmKGytErujDiNN6K8Utt'  
+			  }
+		  },
+		async mounted(){
+		        await MP(this.ak);
+		    },
 		onLaunch: function() {
 
 			let _this = this;
@@ -51,7 +69,7 @@
 			windowWidth: 0,
 			windowHeight: 0,
 			statusBarHeight: 0,
-			menuButtonInfo:[],
+			// menuButtonInfo:[],
 			domain: 'https://loc.qmtruck.com/', //线上地址
 		}
 	}

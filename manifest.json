@@ -1,7 +1,7 @@
 {
-    "name" : "小助手全新",
-    "appid" : "__UNI__BCE8F7D",
-    "description" : "",
+    "name" : "重邮小助手",
+    "appid" : "__UNI__CA619B5",
+    "description" : "重邮校园生活服务小助手",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -50,11 +50,15 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx2b59d93cc87023f1",
+        "appid" : "wx21268bb07696976c",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "es6" : true,
+            "postcss" : true,
+            "minified" : true
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "permission" : {}
     },
     "mp-alipay" : {
         "usingComponents" : true
@@ -68,5 +72,14 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2"
+    "vueVersion" : "2",
+    "h5" : {
+        "sdkConfigs" : {
+            "maps" : {
+                "qqmap" : {
+                    "key" : "UZ6BZ-AGWYU-WN5VG-26YJ2-BVB4J-QXFNQ"
+                }
+            }
+        }
+    }
 }

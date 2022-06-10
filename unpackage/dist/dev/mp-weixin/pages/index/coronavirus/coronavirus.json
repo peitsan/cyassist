@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "wyb-popup": "/components/wyb-popup/wyb-popup"
-  }
-}

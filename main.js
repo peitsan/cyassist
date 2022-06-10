@@ -1,21 +1,15 @@
-import App from './App'
-
-// #ifndef VUE3
 import Vue from 'vue'
+import App from './App.vue'
+import store from '@/store/index.js'
+import VueRouter from 'vue-router'
+import router from './router/router.js'
 Vue.config.productionTip = false
-App.mpType = 'app'
-const app = new Vue({
-    ...App
+Vue.use(VueRouter);
+new Vue({
+  el:'#app',
+  render: h => h(App),
+  router,
+  beforeCreate() {
+		Vue.prototype.$bus = this
+	},
 })
-app.$mount()
-// #endif
-
-// #ifdef VUE3
-import { createSSRApp } from 'vue'
-export function createApp() {
-  const app = createSSRApp(App)
-  return {
-    app
-  }
-}
-// #endif
