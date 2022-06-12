@@ -70,8 +70,17 @@
 			windowHeight: 0,
 			statusBarHeight: 0,
 			// menuButtonInfo:[],
-			domain: 'https://loc.qmtruck.com/', //线上地址
-		}
+			domain: 'http:/cqupt.liiru.com', //线上地址
+		},
+		 // 当界面进入活跃状态时触发
+		activated() {
+		      this.$router.push(this.path)
+		    },
+		    // 导航离开该组件的对应路由时调用
+		beforeRouteLeave (to, from, next) {
+		      this.path = this.$route.path
+		      next()
+		    }
 	}
 </script>
 

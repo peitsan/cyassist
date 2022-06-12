@@ -1,42 +1,104 @@
 
 <template>
-	<!-- <uni-grid :column="2" style="margin: 35px 0px;" :showBorder="false">
-		<block v-for="(item,index) in lists">
-			<uni-grid-item>
-				<div class="flex_column main_axis_space_around second_axis_center" style="background: #ffffff;border-radius: 5px;padding: 40px;" @click="optionClick(index)" :class="index%2==0?'div_left':'div_right'">
-					<image :src="item.imageUrl" mode="aspectFit"
-					style="width: 50px;height: 50px;"></image>
-					<view class="text_investment">
-						{{item.title}}
-					</view>
-				</div>
-			</uni-grid-item>
-		</block>
-	</uni-grid> -->
-    <daily-ck></daily-ck>
+	<view class="page">
+		<view class="page-main">
+			<view class= "top-main">
+				<grid :girdData="girdData" :gutter="'1.563vw'" :gutterBottom="'1.563vw'" :columnNum="'4'">
+			  <template #content="acceptProps">
+			    <view class="card">
+					<transition>
+					  <keep-alive>
+							<router-link :to="{path:acceptProps.item.path}">
+									<view class="vicon">
+									<i 	
+										:class="acceptProps.item.icon">
+									
+									</i>
+								  </view>
+								</router-link>
+					  </keep-alive>
+					</transition>
+				 
+				  </router-link>
+			      <view class="chName">{{acceptProps.item.chName}}</view>
+			      <view class="enName">{{acceptProps.item.enName}}</view>
+			    </view>
+			  </template>
+			</grid>
+			</view>
+			<view class="mid-main">
+				
+			</view>
+		</view>
+</view>
 </template>
 <script>
-	// import uni-grid from "@/uni_modules/uni-grid/components/uni-grid/uni-grid"
+	import grid from "@/components/tabbar-grid/tabbar-grid"
 	import dailyCk from "@/pages/assist/dailyCheck/dailyCheck"
 	export default {
 		components: {
-			// uni-grid,
+			grid,
 			dailyCk
 		},
 		mounted(){
-
+			
 		},
 		data() {
 			return {
-			
-				windowWidth: getApp().globalData.windowWidth,
-				windowHeight: getApp().globalData.windowHeight,
-				screenWidth: getApp().globalData.screenWidth, //屏幕宽度
-				screenHeight: getApp().globalData.screenHeight, //屏幕高度
-				statusBarHeight: getApp().globalData.statusBarHeight, //状态栏高度
-				contentHeight: getApp().globalData.windowHeight - getApp().globalData.menuButtonInfo.top - getApp()
-					.globalData.menuButtonInfo.height - 20, //内容高度
-				menuButtonInfo: getApp().globalData.menuButtonInfo,
+			girdData:[{
+				chName:"健康打卡",
+				enName:"Check Daily",
+				icon:"el-icon-document-checked",
+				path:"/dailyCheck"
+			},{
+				chName:"一键出校",
+				enName:"Quick Quit",
+				icon:"el-icon-position",
+				path:"/quickQuit"
+				},
+				{
+					chName:"附近租房",
+					enName:"Near Rent",
+					icon:"el-icon-office-building",
+					path:"/home"
+				},{
+					chName:"代课发布",
+					enName:"Lesson Help",
+					icon:"el-icon-help",
+					path:""
+				},
+				{
+					chName:"网课急救",
+					enName:"Online Help",
+					icon:"el-icon-magic-stick",
+					path:""
+				},{
+					chName:"闲置发布",
+					enName:"Second Hand",
+					icon:"el-icon-finished",
+					path:""
+					},
+					{
+						chName:"竞赛发布",
+						enName:"Match Host",
+						icon:"el-icon-notebook-2",
+						path:""
+					},{
+						chName:"心动表白",
+						enName:"Express Love",
+						icon:"el-icon-message",
+						path:""
+						},
+						
+				],
+			// 	windowWidth: getApp().globalData.windowWidth,
+			// 	windowHeight: getApp().globalData.windowHeight,
+			// 	screenWidth: getApp().globalData.screenWidth, //屏幕宽度
+			// 	screenHeight: getApp().globalData.screenHeight, //屏幕高度
+			// 	statusBarHeight: getApp().globalData.statusBarHeight, //状态栏高度
+			// 	contentHeight: getApp().globalData.windowHeight - getApp().globalData.menuButtonInfo.top - getApp()
+			// 		.globalData.menuButtonInfo.height - 20, //内容高度
+			// 	menuButtonInfo: getApp().globalData.menuButtonInfo,
 			
 		onShow() {},
 		onUnload() {},
@@ -57,12 +119,38 @@
 }
 </script>
 
-<style lang="scss">
+<style lang="scss"> 
+	
+	.card{
+		border-radius: 4px;
+		border: solid;
+		background-color: #EcfffE;
+		border-color: #EFEFEF;
+		.vicon {
+			font-size:50px;	
+		}
+		.chName{
+			font-size:15px;
+		}
+		.enName{
+			font-size:12px;
+		}
+	}
+	
+	.vicon {
+		font-size:50px;	
+	}
+	.chName{
+		font-size:15px;
+	}
+	.enName{
+		font-size:12px;
+	}
 	.page{
 		.page-main{
 			.top-main{
-				height: 130px;
-				background-color: #007AFF;
+				height: 220px;
+				background-color: #edefff;
 			}
 			.mid-main{
 				

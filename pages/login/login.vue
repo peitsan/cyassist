@@ -71,10 +71,12 @@
 	  data() {
 	    return {
 		  LoginVerify:true,
-	      // 登录表单的数据绑定对象
+	      //登录表单的数据绑定对象
 	      loginForm:{
 	        username:"admin@163.com",
-	        password:"123456",
+	        password:"123456"
+			// username:"",
+			// password:"",
 	      },
 	      // 表单的验证规则对象
 	      loginFormRules: {
@@ -114,8 +116,17 @@
 				    localStorage.setItem("atoken",res.data.token) 
 					this.$router.push("/home"); 
 	             console.log("Login in");
-	            }else
-	            console.log("Login out");
+	            }else if(res.data.Code==401){
+					this.$alert("账号或密码错误", '登录失败', {
+							  				     confirmButtonText: '确定',
+							  				     callback: action => {
+							  				       this.$message({
+							  				         type: 'info',
+							  				         message: `action: ${ action }`
+							  				       });
+							  				     }
+							  				   })
+					}
 	          })
 	          .catch(err=>{
 	          console.log(err)

@@ -8,7 +8,6 @@
 		        "navigationBarTitleText": "登录",
 		        "enablePullDownRefresh": false
 		    }
-		    
 		},
 		{
 			"path": "pages/index/home",
@@ -23,15 +22,18 @@
 				"enablePullDownRefresh": false
 			}
 		
-		}, {
+		}, 
+		
+		{
 			"path": "pages/index/camera/camera",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false
 			}
 
-		}
-        ,{
+		},
+		
+		{
             "path" : "pages/my/my",
             "style" :                                                                                    
             {
@@ -39,8 +41,9 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		
+		{
             "path" : "pages/tools/tools",
             "style" :                                                                                    
             {
@@ -48,8 +51,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/option/option",
             "style" :                                                                                    
             {
@@ -127,6 +130,24 @@
         }
         ,{
             "path" : "components/tabbar-grid/tabbar-grid",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/assist/assist",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/assist/quickQuit/quickQuit",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",

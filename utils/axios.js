@@ -47,7 +47,7 @@ axios.interceptors.response.use(
         return Promise.reject(error)
     }
 )
-export function get(url, params) {
+export function vget(url, params) {
     return new Promise(function (resolve, reject) {
 		let atoken = localStorage.getItem("atoken")
         let turl = baseUrl + url
@@ -89,6 +89,41 @@ export function nullGet(url) {
     })
 }
 
+export function get(turl) {
+    return new Promise(function (resolve, reject) {
+       axios({
+       method:"get",
+       url:turl,
+       headers:{
+        	"Content-Type":'application/json'
+        }
+		}).
+		then((res) => {
+            resolve(res);
+			// withCredentials: true
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
+
+
+export function post(turl, data) {
+    return new Promise(function (resolve, reject) {
+        axios({
+		method:"post",
+        url:turl,
+		data:data,
+		headers:{
+			"Content-Type":'application/json',
+		}
+        }).then((res) => {
+            resolve(res);
+        }).catch((err) => {
+            reject(err)
+        })
+    })
+}
 
 export function npost(url, data) {
     return new Promise(function (resolve, reject) {
@@ -183,11 +218,11 @@ const ntoken=(config) => {
 }
 
 export const settoken=(token)=>{
-	localStorage.setItem('atoken',token)
+	return localStorage.setItem('atoken',token)
 }
 export const gettoken=()=>{
-	localStorage.setItem('atoken')
+	return localStorage.getItem('atoken')
 }
 export const rmtoken=()=>{
-	localStorage.removeItem('atoken')
+   return localStorage.removeItem('atoken')
 }

@@ -85,7 +85,7 @@ export default {
   box-sizing: border-box;
   .gird-item {
     box-sizing: border-box;
-  }
+  }; 
 }
 </style>
 

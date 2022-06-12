@@ -1,15 +1,32 @@
 <template>
 	<view class = "inquireCheckData">
 		<el-button type="success"
+					style="margin: 2% 0 0 5%"
 					@click ="getHistoryCheck()"
-		>	获取历史打卡
+		>	
+		获取打卡记录
 		</el-button>
+		
+		<view v-if="getCheck">
+			<view v-for="(hist,hisid) in checkData">
+		<el-card class="box-card">
+		  <div slot="header" class="clearfix">
+		    <span>{{formatDate(hist.time)}}</span>
+		    <el-button style="float: right; padding: 3px 0" type="text">管理</el-button>
+		  </div>
+		  <div class="card—text card—item">
+		    {{hist.data}}
+		  </div>
+		</el-card>
+		</view>
+		
+		
+		</view>
 	</view>
 </template>
 <script>
-	//局部注册   百度地图
 	import {nullGet} from '../../../utils/axios.js'
-
+	import {formatDate} from '../../../utils/format.js'
 	  export default {
 		components:{
 			
@@ -17,24 +34,8 @@
 	    name: "mapView",
 	    data() {
 	      return {
-			text:" ",
-			popup:false,
-	        map: null,
-	        local: null,
-	        mk: null,
-	        latitude: '',
-	        longitude: '',
-	        keyWords: '',
-			location:'',
-			ywjcqzbl:'',
-			ywjchblj:'',
-			xjzdywqzbl:' ',
-			twsfzc:' ',
-			ywytdzz:' ',
-			beizhu:' ',
-			jkmresult:' ',
-			offset:undefined,
-			
+			checkData:[],
+			getCheck:false
 	    }
 	},
 		mouted(){
@@ -45,9 +46,10 @@
 		async getHistoryCheck(){
 					  let res = await nullGet('/user/checkin'
 					  ).then(res=>{
-		      if(res.data.Code == 200){
-						console.log("okay")
-		       this.$alert('成功获取历史打卡信息!', '获取成功', {
+					if(res.data.code == 200){
+					this.getCheck = true
+					this.checkData = res.data.log
+					this.$alert('成功获取历史打卡信息!', '获取成功', {
 		       			  				     confirmButtonText: '确定',
 		       			  				     callback: action => {
 		       			  				       this.$message({
@@ -55,7 +57,8 @@
 		       			  				         message: `action: ${ action }`
 		       			  				       });
 		       			  				     }
-		       			  				   })  	
+		       			  				   })  
+				
 							
 		      }else{
 							if(res.data.Code == 400)
@@ -104,6 +107,26 @@
 
 
 <style scoped>
+	.card—text {
+	    font-size: 14px;
+	  }
+	
+	  .card—item {
+	    margin-bottom: 18px;
+	  }
+	
+	  .clearfix:before,
+	  .clearfix:after {
+	    display: table;
+	    content: "";
+	  }
+	  .clearfix:after {
+	    clear: both
+	  }
+	
+	  .box-card {
+	    width: 480px;
+	  }
 	.check-form {
 			margin: 20px 10px 20px 15px;
 			background: #FFFFFF;

@@ -25,7 +25,7 @@
 </script>
 
 <style lang="scss">
-	page {
+	.page {
 		background: #F4F5F6;
 	}
 

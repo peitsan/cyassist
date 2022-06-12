@@ -1,6 +1,31 @@
 <template>
-	<view>
+	<div>
+		<view>
+			<view class="top-main">
+					<view class="top-main-title">
+						<text>重邮小助手</text>
+					</view>
+			</view>
 		  <div>
+			  <el-dialog
+			    title="请订阅推送微信服务号"
+			    :visible.sync="dialogVisible"
+				style="text-align:center;width:95%"
+			    :before-close="handleClose">
+					<view>
+						请使用微信扫码订阅推送！
+					</view>
+						<view> 
+						<img :src="this.QRcodeUrl"
+							 style="height:250px;
+								width:250px
+								"> </img>
+					</view>
+					
+				<span slot="footer" class="dialog-footer">
+			      <el-button type="primary" @click="dialogVisible = false">结束</el-button>
+			    </span>
+			  </el-dialog>
 		    <el-dialog
 		      @close="clearDialog"
 		      :close-on-click-modal="false"
@@ -39,9 +64,13 @@
 		        <el-button size="small" @click="popup = false">取 消</el-button>
 		      </div>
 		    </el-dialog>
+			
 		  </div>
 		  
-		<el-button type='warning' class="location" @click="openDialog('获取当前定位')">
+		<el-button type='warning' 
+					class="location"
+					style="margin: 2%  0 0 5%"
+					@click="openDialog('获取当前定位')">
 			获取定位
 		</el-button>
 			
@@ -79,9 +108,7 @@
 				minlength="1"
 				maxlength="4"
 			  ></input>
-			 <!-- <slider
-				:min= "0" :max= "3600" v-model="offset"
-			  ></slider> -->
+			
 		</view>
 		
 		<view class="check-form-items">
@@ -161,11 +188,12 @@
 			  <!-- <el-button type="info" @click="resetLoginForm()">重置</el-button> -->
 			</div>
 	</view>
+	</div>
 </template>
 <script>
 	//局部注册   百度地图
 	import slider from '@/components/e-slider-data/e-slider-data'
-	import {vpost} from '../../../utils/axios.js'
+	import {vpost,post,get,gettoken} from '../../../utils/axios.js'
 	import BaiduMap from 'vue-baidu-map'
 	  export default {
 		components:{
@@ -174,23 +202,30 @@
 	    name: "mapView",
 	    data() {
 	      return {
-			text:" ",
+			num: 0,
+			timer: null,
 			popup:false,
 	        map: null,
 	        local: null,
 	        mk: null,
+			QRcodeUrl:undefined,
+			bindLinkUrl:undefined,
+			subscribeUrl:undefined,
+			wxtipUid:'',
+			text:' ',
 	        latitude: '',
 	        longitude: '',
 	        keyWords: '',
 			location:'',
 			ywjcqzbl:'',
-			ywjchblj:undefined,
-			xjzdywqzbl:undefined,
-			twsfzc:undefined,
-			ywytdzz:undefined,
+			ywjchblj:'0',
+			xjzdywqzbl:'0',
+			twsfzc:'1',
+			ywytdzz:'0',
 			beizhu:" ",
 			jkmresult:' ',
 			offset:undefined,
+			dialogVisible:false,
 			riskLevel:[{
 				sort:"0",
 				label:"低风险",
@@ -220,15 +255,134 @@
 	    },
 		mouted(){
 			// 保留小数
-			
 		},
-	    methods: {
-	
+		destroyed() {
+	//离开页面是销毁
+	    clearInterval(this.timer);
+	    this.timer = null;
+	  },
+		created() {
+	  // 实现轮询
+	 this.timer = window.setInterval(() => {
+	        setTimeout(this.getProjectList(), 0);
+	      }, 20000);
+	 },
+		methods:{
+		async responseQRcode(){
+					  let code = localStorage.getItem("vcode")
+					  let res = await get('https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code='+code
+							).then(res=>{
+							  if(res.data.code == 1000){
+								  console.log("subscribe")
+								  this.wxtipUid = res.data.data;
+								  this.stop();
+								  this.checkUID();
+							  }
+							  else if(res.data.code==1001){
+									console.log(res.data.msg)
+							  }
+						})
+		},
+						  
+		  async getQRcode(){
+			  let res = await post('http://wxpusher.zjiecode.com/api/fun/create/qrcode',
+			  {				
+				  "appToken":"AT_sbsBbC45ylh7QPpH20kC4UEKIF8j3PfX",   //必填，appToken,前面有说明，应用的标志
+				  "extra":gettoken(),      //必填，二维码携带的参数，最长64位
+				  "validTime":1800    //可选，二维码的有效期，默认30分钟，最长30天，单位是秒
+			  }).then(res=>{
+				  localStorage.removeItem("QRcode")
+				  localStorage.removeItem("vcode")
+				  localStorage.setItem("QRcode",res.data.data.shortUrl)
+				  localStorage.setItem("vcode",res.data.data.code)
+				  if(res.data.code == 1000)
+				  {                    
+					  // let surl = 'https://wxpusher.zjiecode.com/api/qrcode/nrw9aX1mhYS05GHoSkiOqjOQND1Hc1r2reV5MBdoYapjAHTxvqmbTCgB5QBAE5dm.jpg'
+					// let url= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx9cb41575cad5c731&redirect_uri=http%3A%2F%2Fwxpusher.zjiecode.com%2Fapi%2Fwxuser%2Fauth%2Fcallback%2Fcode%3Fpath%3D%25252Fwxuser%25252F%252523%25252Ffollow&response_type=code&scope=snsapi_base&state=&connect_redirect=1#wechat_redirect'
+				  						this.$alert('请进行推送公众号微信绑定!', '推送绑定', {
+				  								  				     confirmButtonText: '确定',
+				  								  				     callback: action => {
+				  								  				       this.$message({
+				  								  				         type: 'info',
+				  								  				         message: `action: ${ action }`
+				  								  				       })
+				  													   this.$nextTick(function(){
+				  													   	 this.showQRcode();
+				  													   })
+				  								  				     }
+				  								  				   })
+				  }
+			    }).catch(err=>{
+					   console.log(err)
+			  })
+			 },
+		  async	checkUID(){
+		  			  let res = await vpost('/user/checkin/submitUID',
+		  			  {
+		  				UID:this.wxtipUid
+		  			  }
+		  			  ).then(res=>{  
+		        if(res.data.Code == 200){
+				 this.dialogVisible = false
+		         this.$alert('后台已校验订阅推送', '订阅成功', {
+		         			  				     confirmButtonText: '确定',
+		         			  				     callback: action => {
+		         			  				       this.$message({
+		         			  				         type: 'info',
+		         			  				         message: `action: ${ action }`
+		         			  				       })
+		  												   this.$nextTick(function(){
+		  												   		this.getQRcode();
+		  												   })	
+		         			  				     }
+		         			  				   })
+		  				 
+		        }else{
+		  					if(res.data.Code == 400)
+		  						this.$alert('数据上传格式有误!', '订阅失败', {
+		  								  				     confirmButtonText: '确定',
+		  								  				     callback: action => {
+		  								  				       this.$message({
+		  								  				         type: 'info',
+		  								  				         message: `action: ${ action }`
+		  								  				       });
+		  								  				     }
+		  								  				   })
+		  					else if(res.data.Code == 401)
+		  						this.$alert('身份验证失败,请重新登录!', '订阅失败', {
+		  								  				     confirmButtonText: '确定',
+		  								  				     callback: action => {
+		  								  				       this.$message({
+		  								  				         type: 'info',
+		  								  				         message: `action: ${ action }`
+		  								  				       });
+		  								  				     }
+		  								  				   })
+		  					else if(res.data.Code == 500)
+		  						this.$alert('服务器匆忙,请稍后重试!', '订阅失败', {
+		  								  				     confirmButtonText: '确定',
+		  								  				     callback: action => {
+		  								  				       this.$message({
+		  								  				         type: 'info',
+		  								  				         message: `action: ${ action }`
+		  								  				       });
+		  								  				     }
+		  								  				   }) 
+		  					else {
+		  							console.log("Err601")
+		  							}
+		  				}
+		  				
+		      })
+		      .catch(err=>{
+		      console.log(err)
+		    })
+		  },
 		  async	checkApply(){
 		  			  let res = await vpost('/user/checkin/submitdatas',
 		  			  {
-		  				longitude:this.longitude,
-		  				latitude:this.latitude,
+		  				longitude:String(this.longitude),
+		  				latitude:String(this.latitude),
 						xxdz:this.location,
 						ywjcqzbl:this.ywjcqzbl,
 						ywjchblj:(this.ywjchblj=='1'?true:false),
@@ -240,21 +394,23 @@
 						offset:Number(this.offset),
 						time:this.getTime(),
 		  			  }
-		  			  ).then(res=>{
-						  
+		  			  ).then(res=>{  
 	       	      // if(res.status == 200){
 		        if(res.data.Code == 200){
-				console.log("okay")
-		         this.$alert('已进入自动打卡模式!', '启动成功', {
+				// console.log("okay")
+		         this.$alert('已进入自动打卡模式,设置推送提醒！', '启动成功', {
 		         			  				     confirmButtonText: '确定',
 		         			  				     callback: action => {
 		         			  				       this.$message({
 		         			  				         type: 'info',
 		         			  				         message: `action: ${ action }`
-		         			  				       });
+		         			  				       })
+												   this.$nextTick(function(){
+												   		this.getQRcode();
+												   })	
 		         			  				     }
-		         			  				   })  	
-					
+		         			  				   })
+				 
 		        }else{
 					if(res.data.Code == 400)
 						this.$alert('数据上传格式有误!', '启动失败', {
@@ -290,18 +446,48 @@
 							console.log("Err601")
 							}
 				}
-				 	
+				
 		      })
 		      .catch(err=>{
 		      console.log(err)
 		    })
-		    },
+		  },
 	      // 打开弹窗，name为弹窗名称
 	      async openDialog(name) {
 	        this.text = name;
 	        this.popup = true;
 	        this.initMap();
 	      },
+		  stop() {
+		        clearInterval(this.timer);
+		        this.timer = null;
+		      },
+		    // 请求是否有新消息
+		   getProjectList() {
+		     console.log("请求" + this.num++ + "次");
+			 this.responseQRcode();
+			 if(this.num == 12){
+			 this.stop() 
+			}
+		    },
+		  // 打开对话框
+		  showQRcode(url,surl){
+			this.dialogVisible = true
+			this.QRcodeUrl = localStorage.getItem("QRcode")
+			this.$nextTick(function(){
+				this.responseQRcode()
+			})
+				
+		  },
+		  // 关闭对话框
+		  handleClose(done) {
+		          this.$confirm('确认关闭？')
+		            .then(_ => {
+		              done();
+		            })
+		            .catch(_ => {});
+		 },
+		  
 		  // 输入数据格式校验
 		  getTime(){
 			  let time = new Date();
@@ -334,6 +520,7 @@
 	        }
 	        this.popup = false;
 	      },
+		  
 	      initMap() {
 	        this.$nextTick(() => {
 	          this.map = new BMap.Map("map");
@@ -410,13 +597,23 @@
 	        });
 	        obj.map.panTo(point);
 	      },
-	    }
+		} 
 	  };
 	
 </script>
 
 
 <style scoped>
+	.top-main{
+		height: 30px;
+		background-color: #007AFF;
+		
+	}
+	.top-main-title{
+		text-align: center;
+		color:#FFFFFF;
+		font-size:$uni-font-size-title
+	}
 	.check-form {
 			margin: 20px 10px 20px 15px;
 			background: #FFFFFF;

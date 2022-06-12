@@ -101,7 +101,9 @@
 					  <button v-if="registerStep==true" type="primary" class="register-btn" @click="bindCqupt()">注册</button>
 			        </div>
 			      </view>
+
 			</view>
+			
 		</view>
 </template>
 
@@ -184,7 +186,7 @@
 							 	 })
 				           }
 				         })
-		        }else if(res.data.code == 400){
+		        }else if(res.data.Code == 400){
 						this.$alert('邮箱已被注册或邮箱格式非法,请检查！', '注册失败', {
 						   confirmButtonText: '确定',
 						   callback: action => {
@@ -278,7 +280,7 @@
 </script>
 
 <style lang="scss">
-	page {
+	.page {
 		background: #F4F5F6;
 	}
 
