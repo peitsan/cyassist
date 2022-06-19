@@ -88,6 +88,26 @@ func BindCquptHandler(c *gin.Context) {
 	c.String(backFormat(code, message))
 }
 
+func CancelCheckinHandler(c *gin.Context) {
+	value, ok := c.Get("mail")
+	if !ok {
+		log.Printf("在CheckIndexHandler中访问上下文mail时读取失败")
+		c.String(500, "服务端获取上下文失败")
+	} else {
+		c.String(backFormat(checkin.CancelCheckin(value.(string))))
+	}
+}
+
+func DoCheckinHandler(c *gin.Context) {
+	value, ok := c.Get("mail")
+	if !ok {
+		log.Printf("在CheckIndexHandler中访问上下文mail时读取失败")
+		c.String(500, "服务端获取上下文失败")
+	} else {
+		c.String(backFormat(checkin.DoImmediately(value.(string))))
+	}
+}
+
 // LoginHandler 登录
 func LoginHandler(c *gin.Context) {
 	var form database.LoginInfo

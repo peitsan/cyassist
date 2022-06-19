@@ -4,6 +4,7 @@ import (
 	"checkinWebsite/database"
 	"errors"
 	"log"
+	"math/rand"
 	"time"
 )
 
@@ -26,6 +27,33 @@ type CheckinModel struct {
 	Jkmresult     string    `json:"jkmresult" form:"jkmresult" binding:"required"`          //渝康码颜色：绿色、黄色、红色、其它
 	Beizhu        string    `json:"beizhu" form:"beizhu" `                                  //备注
 	Uid           string    `json:"uid" form:"uid"`                                         //微信推送
+	Enable        bool      `json:"enable" db:"enable"`                                     //是否开启打卡
+}
+
+//数据库查询用
+type checkUser struct {
+	Mail   string    `db:"mail"`
+	Time   time.Time `db:"time"`
+	Offset int       `db:"offset"`
+}
+
+// CheckUser 当日打卡计划实际表，已经经过offset运算和剔除不满足的时间
+type CheckUser struct {
+	Mail string
+	Time time.Time
+}
+
+func AddCheckinModel(model CheckinModel) error {
+	if &model.Uid == nil {
+		model.Uid = ""
+	}
+	sql := "INSERT INTO checkin values (:mail,:time,:offset,:szdq,:xxdz,:locationBig,:locationSmall,:latitude,:longitude,:ywjcqzbl,:ywjchblj,:xjzdywqzbl,:twsfzc,:ywytdzz,:jkmresult,:beizhu,:uid)"
+	_, err := database.Db.NamedExec(sql, &model)
+	if err != nil {
+		log.Printf("新建打卡信息时发生错误，user:%v,err:%v", model.Mail, err.Error())
+		return err
+	}
+	return nil
 }
 
 func GetCheckinModel(mail string) (*CheckinModel, error) {
@@ -36,6 +64,34 @@ func GetCheckinModel(mail string) (*CheckinModel, error) {
 	}
 	model.mail = model.Mail
 	return model, nil
+}
+
+// GetAllCheckUsers 若错误返回空
+func GetAllCheckUsers(t time.Time) (users []CheckUser) {
+	sql := "select mail,time,offset from checkin where enable = true"
+	var dbUsers []checkUser
+	err := database.Db.Select(&dbUsers, sql)
+	if err != nil {
+		log.Printf("从数据库中读取在%v时间以后的打卡人员失败err:%v", t, err)
+		return nil
+	}
+	//不是精度要求很高的随机数，seed一次足矣
+	rand.Seed(time.Now().Unix())
+	for _, i := range dbUsers {
+		//判断用户设置打卡时间是否在输入t时间之后，否则不加入队列
+		l := (i.Time.Hour()-t.Hour())*3600 + (i.Time.Minute()-t.Minute())*60 + i.Time.Second() - t.Second() //距离输入t时间的秒数，大于0说明该用户打卡时间晚于输入t，可以打卡
+		if l > 0 {
+			r := (24-i.Time.Hour())*3600 + (0-i.Time.Minute())*60 - i.Time.Second() //offset最大有边界，
+			if r > i.Offset/2 {
+				r = i.Offset / 2
+			}
+			if l > i.Offset/2 {
+				l = i.Offset / 2
+			}
+			users = append(users, CheckUser{i.Mail, time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), i.Time.Hour(), i.Time.Minute(), i.Time.Second(), 0, time.Now().Location()).Add(time.Duration(rand.Intn(l+r)-l) * time.Second)})
+		}
+	}
+	return users
 }
 
 // FindCheckinModel 查询用户是否录入过信息
@@ -51,19 +107,6 @@ func FindCheckinModel(mail string) (bool, error) {
 	} else {
 		return false, nil
 	}
-}
-
-func AddCheckinModel(model CheckinModel) error {
-	if &model.Uid == nil {
-		model.Uid = ""
-	}
-	sql := "INSERT INTO checkin values (:mail,:time,:offset,:szdq,:xxdz,:locationBig,:locationSmall,:latitude,:longitude,:ywjcqzbl,:ywjchblj,:xjzdywqzbl,:twsfzc,:ywytdzz,:jkmresult,:beizhu,:uid)"
-	_, err := database.Db.NamedExec(sql, &model)
-	if err != nil {
-		log.Printf("新建打卡信息时发生错误，user:%v,err:%v", model.Mail, err.Error())
-		return err
-	}
-	return nil
 }
 
 func (c *CheckinModel) UpdateAllCheckinModel(model CheckinModel) error {

@@ -6,8 +6,10 @@ import (
 	"checkinWebsite/database/checkinDatabase"
 	"checkinWebsite/database/userDatabase"
 	"checkinWebsite/joshuaRequest"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -15,6 +17,46 @@ import (
 	"strings"
 	"time"
 )
+
+type TasksTimeWheel struct {
+	TimeWheel timer.Timer
+	Nodes     map[string]timer.TimeNoder //用来记录所有node节点，以便快速查找方便停止特定任务  todo 有待优化空间
+}
+
+var Tasks *TasksTimeWheel
+
+// CheckinController checkin核心管理程序
+func CheckinController() {
+	//初始化任务，将只启动还未到时间任务
+	c := make(chan *TasksTimeWheel)
+	go GenerateTimeWheel(time.Now(), c)
+	Tasks = <-c
+	if Tasks != nil {
+		go Tasks.TimeWheel.Run()
+	}
+
+	//每天11:58分会进行第二天的队列生成，0:00会将生成好的队列启动并关闭上一日time wheel
+	changeTime, generateTime := scheduleTime()
+	ticket := time.NewTicker(1 * time.Second)
+
+	for {
+		rcTime := <-ticket.C
+		if rcTime.Equal(generateTime) {
+			log.Println("开始队列排序")
+			go GenerateTimeWheel(time.Now(), c)
+		}
+		if rcTime.Equal(changeTime) {
+			log.Println("开始每日更换队列")
+			Tasks.TimeWheel.Stop()
+			Tasks = <-c
+			if Tasks != nil {
+				go Tasks.TimeWheel.Run()
+			}
+			changeTime, generateTime = scheduleTime()
+			log.Println("完成每日更换队列")
+		}
+	}
+}
 
 // DoCheckin 执行打卡
 func DoCheckin(mail string) (err error, data string, uid string) {
@@ -106,13 +148,15 @@ func DoCheckin(mail string) (err error, data string, uid string) {
 
 	uid = checkinModel.Uid
 
-	payloadBytes, err := json.Marshal(&jsonStruct)
+	jsonBytes, err := json.Marshal(&jsonStruct)
 	if err != nil {
 		log.Printf("在用户:%v, 构造打卡请求消息时json转换失败err:%v", mail, err.Error())
 		return err, "", uid
 	}
+	payload := base64.StdEncoding.EncodeToString(jsonBytes)
 
-	options := []joshuaRequest.FuncRequestOption{joshuaRequest.SetTimeout(2 * time.Second), joshuaRequest.SetHeader(headers), joshuaRequest.SetData(string(payloadBytes))}
+	options := []joshuaRequest.FuncRequestOption{joshuaRequest.SetTimeout(2 * time.Second), joshuaRequest.SetHeader(headers), joshuaRequest.SetData(fmt.Sprintf("{\"key\":\"%s\"}", payload))}
+	fmt.Printf(fmt.Sprintf("{\"key\":\"%s\"}", payload))
 
 	response, err := joshuaRequest.Request(joshuaRequest.MethodPost, url, options...)
 
@@ -141,6 +185,7 @@ func DoCheckin(mail string) (err error, data string, uid string) {
 // GenerateFuncCallback 时间轮任务入口
 func GenerateFuncCallback(mail string, timer timer.Timer, times int) func() {
 	return func() {
+		println("开始打卡啦")
 		err, message, uid := DoCheckin(mail)
 
 		var data string
@@ -148,6 +193,7 @@ func GenerateFuncCallback(mail string, timer timer.Timer, times int) func() {
 		var d time.Duration
 
 		if err != nil {
+			println("dakachucuo")
 			ok = false
 			switch times {
 			case 0:
@@ -167,19 +213,62 @@ func GenerateFuncCallback(mail string, timer timer.Timer, times int) func() {
 			if err.Error() != "校服服务器返回打卡失败" {
 				message = err.Error()
 			}
-
-			err = utils.SendToWechat(uid, message, data)
-
-			if err != nil {
-				data += "(此消息微信推送失败)"
-			}
-
-			checkinDatabase.StoreCheckinLog(mail, data, message)
-
-			if !ok && times != 3 {
-				timer.AfterFunc(d, GenerateFuncCallback(mail, timer, times+1))
+		} else {
+			switch times {
+			case 0:
+				data = "打卡成功"
+			case 1:
+				data = "第二次打卡成功"
+			case 2:
+				data = "第三次打卡成功"
+			case 3:
+				data = "最后一次打卡成功"
 			}
 		}
 
+		//发送至微信
+		var wxErr error
+		if uid != "" {
+			println("wx")
+			wxErr = utils.SendToWechat(uid, message, data)
+		}
+
+		if wxErr != nil {
+			data += "(此消息微信推送失败)"
+		}
+
+		checkinDatabase.StoreCheckinLog(mail, data, message)
+
+		if !ok && times != 3 && timer != nil {
+			timer.AfterFunc(d, GenerateFuncCallback(mail, timer, times+1))
+		}
+
 	}
+}
+
+// GenerateTimeWheel 生成每日任务队列
+func GenerateTimeWheel(t time.Time, c chan *TasksTimeWheel) {
+	users := checkinDatabase.GetAllCheckUsers(t)
+	if users == nil {
+		c <- nil
+		return
+	}
+	timeWheel := timer.NewTimer()
+	tasks := &TasksTimeWheel{timeWheel, make(map[string]timer.TimeNoder)}
+
+	for _, i := range users {
+		fmt.Printf("%v\n", i.Time.Sub(time.Now()))
+		tasks.Nodes[i.Mail] = timeWheel.AfterFunc(i.Time.Sub(time.Now()), GenerateFuncCallback(i.Mail, timeWheel, 0))
+	}
+	//队列排序完成，等待指定时间切换
+	c <- tasks
+	return
+}
+
+//生成每天产生队列以及更改队列的时间
+func scheduleTime() (changeTime time.Time, generateTime time.Time) {
+	tempTime := time.Now().Add(24 * time.Hour)
+	changeTime = time.Date(tempTime.Year(), tempTime.Month(), tempTime.Day(), 0, 0, 0, 0, tempTime.Location())
+	generateTime = changeTime.Add(-2 * time.Minute)
+	return
 }

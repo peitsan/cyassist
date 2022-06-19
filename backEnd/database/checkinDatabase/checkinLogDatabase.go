@@ -33,6 +33,6 @@ func StoreCheckinLog(mail string, data string, logs string) {
 	sql := "insert into checkinlog values (?,?,?,?)"
 	_, err := database.Db.Exec(sql, mail, data, logs, time.Now())
 	if err != nil {
-		log.Printf("在储存用户%v，打卡信息时数据库异常,存入数据为data:%v,log:%v", mail, data, logs)
+		log.Printf("在储存用户%v的打卡信息时数据库异常,存入数据为data:%v,log:%v,err:%v", mail, data, logs, err)
 	}
 }

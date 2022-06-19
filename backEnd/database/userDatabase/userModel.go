@@ -3,6 +3,7 @@ package userDatabase
 import (
 	"checkinWebsite/database"
 	"errors"
+	"log"
 )
 
 type UserModel struct {
@@ -15,8 +16,9 @@ type UserModel struct {
 
 func GetCheckinModel(mail string) (*UserModel, error) {
 	model := new(UserModel)
-	err := database.Db.Get(model, "SELECT * FROM user WHERE mail=? LIMIT 1", mail)
+	err := database.Db.Get(model, "SELECT openid,name,xh,sex FROM user WHERE mail=? LIMIT 1", mail)
 	if err != nil {
+		log.Printf("获取用户%v的checkinModel错误err:%v", mail, err)
 		return nil, errors.New("用户不存在")
 	}
 	model.mail = mail

@@ -15,7 +15,7 @@ var APPTOKEN string
 func SendToWechat(uid string, content string, summary string) error {
 	postUrl := "http://wxpusher.zjiecode.com/api/send/message"
 	sendStruct := struct {
-		Apptoken string   `json:"Apptoken"`
+		Apptoken string   `json:"appToken"`
 		Content  string   `json:"content"`
 		Summary  string   `json:"summary"`
 		Uids     []string `json:"uids"`
@@ -27,7 +27,7 @@ func SendToWechat(uid string, content string, summary string) error {
 		return err
 	}
 
-	response, err := joshuaRequest.Request(joshuaRequest.MethodPost, postUrl, joshuaRequest.SetData(string(jsonBytes)))
+	response, err := joshuaRequest.Request(joshuaRequest.MethodPost, postUrl, joshuaRequest.SetData(string(jsonBytes)), joshuaRequest.SetContentType("application/json"))
 	if err != nil {
 		log.Printf("在给uid:%v用户推送微信消息content:%v,summary:%v时，网络请求失败err:%v", uid, content, summary, err.Error())
 		return err

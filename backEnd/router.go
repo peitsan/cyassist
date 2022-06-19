@@ -21,6 +21,8 @@ func GetRouter(r *gin.Engine) {
 	userGroup := r.Group("/user", AuthHandler)
 	userGroup.GET("/checkin", CheckinIndexHandler)
 	userGroup.GET("/checkin/querydatas", QueryDatasHandler)
+	userGroup.GET("/checkin/doImmediately", DoCheckinHandler)
+	userGroup.GET("/checkin/cancelCheckin", CancelCheckinHandler)
 }
 
 func PostRouter(r *gin.Engine) {
@@ -40,4 +42,6 @@ func OptionRouter(r *gin.Engine) {
 	r.OPTIONS("/user/checkin", OptionHandler)
 	r.OPTIONS("/user/checkin/querydatas", OptionHandler)
 	r.OPTIONS("/user/checkin/submitUID", OptionHandler)
+	r.OPTIONS("/user/checkin/doImmediately", OptionHandler)
+	r.OPTIONS("/user/checkin/cancelCheckin", OptionHandler)
 }

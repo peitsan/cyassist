@@ -1,6 +1,7 @@
 package main
 
 import (
+	"checkinWebsite/app/checkin/doCheckin"
 	"checkinWebsite/app/login"
 	"checkinWebsite/app/utils"
 	"checkinWebsite/database"
@@ -28,7 +29,7 @@ type SecurityConfig struct {
 	Key string `yaml:"key"`
 }
 
-type wxPusher struct {
+type WxPusher struct {
 	AppToken string `yaml:"appToken"`
 }
 
@@ -36,7 +37,7 @@ type YamlConfig struct {
 	Mysql    MysqlConfig    `yaml:"mysql"`
 	Http     HttpConfig     `yaml:"http"`
 	Security SecurityConfig `yaml:"security"`
-	wxPusher wxPusher       `yaml:"wxPusher"`
+	WxPusher WxPusher       `yaml:"wxPusher"`
 }
 
 func main() {
@@ -51,8 +52,9 @@ func main() {
 	log.SetOutput(logFile) // 将文件设置为log输出的文件
 	key := keyTo16Key(config.Security.Key)
 	r := InitialRouter(key)
-	utils.APPTOKEN = config.wxPusher.AppToken
+	utils.APPTOKEN = config.WxPusher.AppToken //设置wx推送应用token
 	login.Key = []byte(key)
+	go doCheckin.CheckinController()
 	err = r.Run(fmt.Sprintf("%v:%v", config.Http.Address, config.Http.Port))
 	if err != nil {
 		panic("服务启动失败，发生以下错误:" + err.Error())
