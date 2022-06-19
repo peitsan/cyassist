@@ -1,13 +1,13 @@
 mysql:    #数据库连接相关信息，采用tcp协议连接
   host: localhost
   port: 3306
-  username: root
-  password: su0308..
+  username: username
+  password: password
   database: cqupt
 http:   #指定服务监听地址和端口
   address: 0.0.0.0 #若留空默认监听0.0.0.0即全地址
   port: 8000  #若留空默认监听8080端口
 security:
-  key: cquptnb  #用来加密session、cookie登录的密钥，若你不知道这是什么，乱打一个就好
+  key: cqupthelper   #用来加密session、cookie登录的密钥，若你不知道这是什么，乱打一个就好
 wxPusher:
-  appToken: AT_sbsBbC45ylh7QPpH20kC4UEKIF8j3PfX   #Wxpusher应用token,用来进行微信通知
+  appToken: AT_zhegezhishiceshitoken   #Wxpusher应用token,用来进行微信通知
